@@ -118,8 +118,8 @@ ec2.client.describe_instances().data()[:reservation_set].each do |res|
 	}
 
 	instance_columns = [instance_i.to_s]
-	
-	@config['columns'].each do |c| 
+
+	@config['columns'].each do |c|
 		val = ''
 
 		if c.start_with? 'tag:'
@@ -158,5 +158,7 @@ if instance_key.nil?
 	raise "I don't have an SSH key called #{instance[:key]}"
 end
 
+remoteCmd = ARGV[1] ? "#{ARGV[1]}" : ""
+
 puts "Connecting to #{instance[:ip]}"
-exec "ssh -i #{instance_key[:path]} #{instance_key[:user]}@#{instance[:ip]}"
+exec "ssh -i #{instance_key[:path]} #{instance_key[:user]}@#{instance[:ip]} #{remoteCmd}"
