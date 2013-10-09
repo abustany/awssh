@@ -1,0 +1,4 @@
+{
+	"columns": ["instance_id", "tag:aws:cloudformation:stack-name"],
+	"default-aws-region": "eu-west-1"
+}
