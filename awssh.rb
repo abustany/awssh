@@ -106,6 +106,12 @@ ec2 = AWS::EC2.new
 instance_map = {}
 instance_i = 0
 
+instance_table = []
+
+# Add table header (instance index is first column)
+instance_table << [''] + @config['columns']
+
+# Build table contents
 ec2.client.describe_instances().data()[:reservation_set].each do |res|
 	instance = res[:instances_set][0]
 	next if instance.nil?
@@ -132,9 +138,30 @@ ec2.client.describe_instances().data()[:reservation_set].each do |res|
 		instance_columns << val
 	end
 
-	puts instance_columns.join(' ')
+	instance_table << instance_columns
 
 	instance_i += 1
+end
+
+# Format and print table
+col_width = instance_table[0].map { |x| 0 }
+
+instance_table.each do |line|
+	line.each_with_index do |col, i|
+		col_width[i] = [col_width[i], col.to_s().size()].max
+	end
+end
+
+instance_table.insert(1, col_width.map { |x| "-" * x })
+
+instance_table.each do |line|
+	out = []
+
+	line.each_with_index do |col, i|
+		out << (" " + col.to_s().ljust(col_width[i]) + " ")
+	end
+
+	puts out.join("|")
 end
 
 puts "Instance number?"
