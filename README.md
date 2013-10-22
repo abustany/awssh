@@ -20,7 +20,13 @@ Use
 ===
 
 Just put the script somewhere in your path and run it, optionally passing the
-AWS region to use as a parameter.
+AWS region to use as a parameter. You can also pass a command to run on the
+instance after all the options, like this:
+
+```awssh --region eu-west-1 -- tail -f /var/log/messages```
+
+Passing -- is mandatory, as it'll tell awssh to stop parsing options at this
+point of the command line.
 
 TODO
 ====
