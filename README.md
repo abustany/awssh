@@ -24,8 +24,6 @@ AWS region to use as a parameter.
 
 TODO
 ====
-- Optionally disable host key file verification to avoid the nags from SSH when
-IPs keep changing.
 - Automatically download and setup private keys from AWS when possible.
 - Better column formatting (or at least, *some* column formatting).
 

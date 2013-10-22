@@ -208,6 +208,11 @@ if instance_key.nil?
 end
 
 cmd = ARGV.join(' ')
+ssh_params = "-i #{instance_key[:path]} -t"
+
+if @config['disable-host-key-check'] == true
+	ssh_params += " -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null'"
+end
 
 if cmd.size() > 0
 	puts "Running command on #{instance[:ip]}: #{cmd}"
@@ -220,4 +225,4 @@ end
 # PAM settings)
 # StrictHostKeyChecking and UserKnownHostsFile disabled so that we don't need to
 # confirm connection to new instances
-exec "ssh -i #{instance_key[:path]} -t -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' #{instance_key[:user]}@#{instance[:ip]} #{ARGV.join(' ')}"
+exec "ssh #{ssh_params} #{instance_key[:user]}@#{instance[:ip]} #{ARGV.join(' ')}"
