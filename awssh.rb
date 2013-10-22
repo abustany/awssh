@@ -22,7 +22,16 @@
 
 require 'rubygems'
 require 'aws-sdk'
+require 'getoptlong'
 require 'json'
+
+HelpMessage = <<EOF
+Usage: #{$0} [OPTIONS]
+Simple SSH launcher to connect to Amazon EC2 instances.
+
+Options:
+  -r, --region=REGION	Use the given REGION for listing instances
+EOF
 
 # Return configuration directories in increasing order of priority
 def config_dirs
@@ -91,7 +100,27 @@ end
 @config = load_config()
 @keys = load_keys()
 
-region = (ARGV[0] or @config['default-aws-region'] or ENV['AWS_REGION'] or 'eu-west-1')
+region = (@config['default-aws-region'] or ENV['AWS_REGION'] or 'eu-west-1')
+
+opts = GetoptLong.new(
+	['--help', '-h', GetoptLong::NO_ARGUMENT],
+	['--region', '-r', GetoptLong::REQUIRED_ARGUMENT]
+)
+
+opts.each do |opt, arg|
+	case opt
+	when '--help'
+		puts HelpMessage
+		exit 0
+	when '--region'
+		region = arg.to_s
+	end
+end
+
+if ARGV.size() != 0
+	puts 'Error: This command takes no parameters'
+	exit 1
+end
 
 puts "Using region #{region}"
 
