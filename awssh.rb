@@ -46,8 +46,6 @@ def load_config
 
 		next unless File.file? file_path
 
-		puts "Loading configuration from #{file_path}"
-
 		config.merge!(JSON.load(File.open(file_path)))
 	end
 
