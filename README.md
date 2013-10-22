@@ -25,7 +25,6 @@ AWS region to use as a parameter.
 TODO
 ====
 - Automatically download and setup private keys from AWS when possible.
-- Better column formatting (or at least, *some* column formatting).
 
 ---
 [1] http://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_instances-instance_method
