@@ -115,11 +115,6 @@ opts.each do |opt, arg|
 	end
 end
 
-if ARGV.size() != 0
-	puts 'Error: This command takes no parameters'
-	exit 1
-end
-
 puts "Using region #{region}"
 
 AWS.config(
@@ -212,5 +207,12 @@ if instance_key.nil?
 	raise "I don't have an SSH key called #{instance[:key]}"
 end
 
-puts "Connecting to #{instance[:ip]}"
-exec "ssh -i #{instance_key[:path]} #{instance_key[:user]}@#{instance[:ip]}"
+cmd = ARGV.join(' ')
+
+if cmd.size() > 0
+	puts "Running command on #{instance[:ip]}: #{cmd}"
+else
+	puts "Connecting to #{instance[:ip]}"
+end
+
+exec "ssh -i #{instance_key[:path]} #{instance_key[:user]}@#{instance[:ip]} #{ARGV.join(' ')}"
