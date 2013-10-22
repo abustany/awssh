@@ -215,4 +215,9 @@ else
 	puts "Connecting to #{instance[:ip]}"
 end
 
-exec "ssh -i #{instance_key[:path]} #{instance_key[:user]}@#{instance[:ip]} #{ARGV.join(' ')}"
+# -i to point at the right SSH key
+# -t to request a TTY (else sudo would not work where requiretty is set in the
+# PAM settings)
+# StrictHostKeyChecking and UserKnownHostsFile disabled so that we don't need to
+# confirm connection to new instances
+exec "ssh -i #{instance_key[:path]} -t -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' #{instance_key[:user]}@#{instance[:ip]} #{ARGV.join(' ')}"
