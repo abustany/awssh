@@ -206,6 +206,7 @@ ec2.client.describe_instances().data()[:reservation_set].each do |res|
 	next unless instance_matches
 
 	instance_map[instance_i] = {
+		:id => instance[:instance_id],
 		:ip => instance[:ip_address],
 		:key => instance[:key_name],
 	}
@@ -253,9 +254,9 @@ if @config['disable-host-key-check'] == true
 end
 
 if cmd.size() > 0
-	puts "Running command on #{instance[:ip]}: #{cmd}"
+	puts "Running command on #{instance[:id]} (#{instance[:ip]}): #{cmd}"
 else
-	puts "Connecting to #{instance[:ip]}"
+	puts "Connecting to #{instance[:id]} (#{instance[:ip]})"
 end
 
 # -i to point at the right SSH key
