@@ -35,7 +35,13 @@ EOF
 
 # Return configuration directories in increasing order of priority
 def config_dirs
-	return (ENV['XDG_CONFIG_DIRS'] or ['/etc', File.expand_path('~/.config')]).reverse().map{|x| x + '/awssh'}
+	dirs = unless ENV['XDG_CONFIG_DIRS'].nil?
+			   ENV['XDG_CONFIG_DIRS'].split(':').reject {|x| x == ''}
+		   else
+			   ['/etc', File.expand_path('~/.config')]
+		   end
+
+	return dirs.reverse().map{|x| x + '/awssh'}
 end
 
 def load_config
