@@ -101,6 +101,30 @@ def tag_set_value(tag_set, key)
 	return nil
 end
 
+def print_instance_table(table)
+	table = table.clone
+
+	col_width = table[0].map { |x| 0 }
+
+	table.each do |line|
+		line.each_with_index do |col, i|
+			col_width[i] = [col_width[i], col.to_s().size()].max
+		end
+	end
+
+	table.insert(1, col_width.map { |x| "-" * x })
+
+	table.each do |line|
+		out = []
+
+		line.each_with_index do |col, i|
+			out << (" " + col.to_s().ljust(col_width[i]) + " ")
+		end
+
+		puts out.join("|")
+	end
+end
+
 @config = load_config()
 @keys = load_keys()
 
@@ -172,25 +196,7 @@ ec2.client.describe_instances().data()[:reservation_set].each do |res|
 end
 
 # Format and print table
-col_width = instance_table[0].map { |x| 0 }
-
-instance_table.each do |line|
-	line.each_with_index do |col, i|
-		col_width[i] = [col_width[i], col.to_s().size()].max
-	end
-end
-
-instance_table.insert(1, col_width.map { |x| "-" * x })
-
-instance_table.each do |line|
-	out = []
-
-	line.each_with_index do |col, i|
-		out << (" " + col.to_s().ljust(col_width[i]) + " ")
-	end
-
-	puts out.join("|")
-end
+print_instance_table(instance_table)
 
 puts "Instance number?"
 number = -1
