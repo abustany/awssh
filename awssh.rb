@@ -101,6 +101,16 @@ def tag_set_value(tag_set, key)
 	return nil
 end
 
+def fuzzymatch(needle, haystack)
+	return true if (needle.nil? or needle == '')
+	return false if haystack.nil?
+
+	idx = haystack.index(needle[0])
+
+	return false if idx.nil?
+	return fuzzymatch(needle[1..-1], haystack[idx..-1])
+end
+
 def print_instance_table(table)
 	table = table.clone
 
@@ -129,10 +139,12 @@ end
 @keys = load_keys()
 
 region = (@config['default-aws-region'] or ENV['AWS_REGION'] or 'eu-west-1')
+match = nil
 
 opts = GetoptLong.new(
 	['--help', '-h', GetoptLong::NO_ARGUMENT],
-	['--region', '-r', GetoptLong::REQUIRED_ARGUMENT]
+	['--region', '-r', GetoptLong::REQUIRED_ARGUMENT],
+	['--match', '-m', GetoptLong::REQUIRED_ARGUMENT]
 )
 
 opts.each do |opt, arg|
@@ -142,6 +154,8 @@ opts.each do |opt, arg|
 		exit 0
 	when '--region'
 		region = arg.to_s
+	when '--match'
+		match = arg.to_s
 	end
 end
 
@@ -170,12 +184,9 @@ ec2.client.describe_instances().data()[:reservation_set].each do |res|
 
 	next unless instance[:instance_state][:name] == 'running'
 
-	instance_map[instance_i] = {
-		:ip => instance[:ip_address],
-		:key => instance[:key_name],
-	}
-
 	instance_columns = [instance_i.to_s]
+
+	instance_matches = false
 	
 	@config['columns'].each do |c| 
 		val = ''
@@ -187,27 +198,42 @@ ec2.client.describe_instances().data()[:reservation_set].each do |res|
 			val = instance[c.to_sym]
 		end
 
+		instance_matches |= fuzzymatch(match, val)
+
 		instance_columns << val
 	end
+
+	next unless instance_matches
+
+	instance_map[instance_i] = {
+		:ip => instance[:ip_address],
+		:key => instance[:key_name],
+	}
 
 	instance_table << instance_columns
 
 	instance_i += 1
 end
 
-# Format and print table
-print_instance_table(instance_table)
+instance = nil
 
-puts "Instance number?"
-number = -1
+if instance_map.size() > 1
+	# Format and print table
+	print_instance_table(instance_table)
 
-begin
-	number = Integer(STDIN.readline().strip())
-rescue Interrupt
-	exit 0
+	puts "Instance number?"
+	number = -1
+
+	begin
+		number = Integer(STDIN.readline().strip())
+	rescue Interrupt
+		exit 0
+	end
+
+	instance = instance_map[number]
+else
+	instance = instance_map[0]
 end
-
-instance = instance_map[number]
 
 if instance.nil?
 	raise "Invalid instance number #{number}"
