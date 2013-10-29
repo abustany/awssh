@@ -35,11 +35,8 @@ EOF
 
 # Return configuration directories in increasing order of priority
 def config_dirs
-	dirs = unless ENV['XDG_CONFIG_DIRS'].nil?
-			   ENV['XDG_CONFIG_DIRS'].split(':').reject {|x| x == ''}
-		   else
-			   ['/etc', File.expand_path('~/.config')]
-		   end
+	dirs = (ENV['XDG_CONFIG_DIRS'] or '').split(':').reject {|x| x == ''}
+	dirs << ['/etc', File.expand_path('~/.config')]
 
 	return dirs.reverse().map{|x| x + '/awssh'}
 end
