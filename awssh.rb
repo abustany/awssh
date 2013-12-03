@@ -216,7 +216,10 @@ end
 
 instance = nil
 
-if instance_map.size() > 1
+if instance_map.size() == 0
+	puts "No AWS instance available in this region"
+	exit 0
+elsif instance_map.size() > 1
 	# Format and print table
 	print_instance_table(instance_table)
 
