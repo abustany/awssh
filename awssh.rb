@@ -166,7 +166,8 @@ puts "Using region #{region}"
 AWS.config(
 	:access_key_id => ENV['AWS_ACCESS_KEY'],
 	:secret_access_key => ENV['AWS_SECRET_KEY'],
-	:region => region
+	:region => region,
+	:proxy_uri => ENV['http_proxy']
 )
 
 ec2 = AWS::EC2.new
