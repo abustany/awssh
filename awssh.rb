@@ -30,7 +30,11 @@ Usage: #{$0} [OPTIONS]
 Simple SSH launcher to connect to Amazon EC2 instances.
 
 Options:
-  -r, --region=REGION	Use the given REGION for listing instances
+  -h, --help           Display this message
+  -r, --region=REGION  Use the given REGION for listing instances
+  -m, --match=MATCH    Only list results that match MATCH
+                       A name matches if it contains all the letters from MATCH
+                       in order (eg. "tmh" matches "thismatches").
 EOF
 
 # Return configuration directories in increasing order of priority
