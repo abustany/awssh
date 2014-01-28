@@ -35,6 +35,7 @@ Options:
   -m, --match=MATCH    Only list results that match MATCH
                        A name matches if it contains all the letters from MATCH
                        in order (eg. "tmh" matches "thismatches").
+  -e, --equal=VALUE    Only list results that have a column equal to VALUE
 EOF
 
 # Return configuration directories in increasing order of priority
@@ -141,12 +142,14 @@ end
 @keys = load_keys()
 
 region = (@config['default-aws-region'] or ENV['AWS_REGION'] or 'eu-west-1')
-match = nil
+fuzzy_match_value = nil
+exact_match_value = nil
 
 opts = GetoptLong.new(
 	['--help', '-h', GetoptLong::NO_ARGUMENT],
 	['--region', '-r', GetoptLong::REQUIRED_ARGUMENT],
-	['--match', '-m', GetoptLong::REQUIRED_ARGUMENT]
+	['--match', '-m', GetoptLong::REQUIRED_ARGUMENT],
+	['--equal', '-e', GetoptLong::REQUIRED_ARGUMENT]
 )
 
 opts.each do |opt, arg|
@@ -157,7 +160,9 @@ opts.each do |opt, arg|
 	when '--region'
 		region = arg.to_s
 	when '--match'
-		match = arg.to_s
+		fuzzy_match_value = arg.to_s
+	when '--equal'
+		exact_match_value = arg.to_s
 	end
 end
 
@@ -200,7 +205,17 @@ ec2.client.describe_instances().data()[:reservation_set].each do |res|
 			val = instance[c.to_sym]
 		end
 
-		instance_matches |= fuzzymatch(match, val)
+		if fuzzy_match_value
+			instance_matches |= fuzzymatch(fuzzy_match_value, val)
+		end
+
+		if exact_match_value
+			instance_matches |= (exact_match_value == val)
+		end
+
+		if not (fuzzy_match_value || exact_match_value)
+			instance_matches = true
+		end
 
 		instance_columns << val
 	end
