@@ -21,7 +21,13 @@
 # THE SOFTWARE.
 
 require 'rubygems'
-require 'aws-sdk'
+
+begin
+	require 'aws-sdk'
+rescue LoadError
+	require 'aws-sdk-v1'
+end
+
 require 'getoptlong'
 require 'json'
 
