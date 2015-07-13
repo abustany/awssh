@@ -193,51 +193,52 @@ instance_table << [''] + @config['columns']
 
 # Build table contents
 ec2.client.describe_instances().data()[:reservation_set].each do |res|
-	instance = res[:instances_set][0]
-	next if instance.nil?
+	res[:instances_set].each do |instance|
+		next if instance.nil?
 
-	next unless instance[:instance_state][:name] == 'running'
+		next unless instance[:instance_state][:name] == 'running'
 
-	instance_columns = [instance_i.to_s]
+		instance_columns = [instance_i.to_s]
 
-	instance_matches = false
+		instance_matches = false
 	
-	@config['columns'].each do |c| 
-		val = ''
+		@config['columns'].each do |c|
+			val = ''
 
-		if c.start_with? 'tag:'
-			tag_name = c[4..-1]
-			val = tag_set_value(instance[:tag_set], tag_name)
-		else
-			val = instance[c.to_sym]
+			if c.start_with? 'tag:'
+				tag_name = c[4..-1]
+				val = tag_set_value(instance[:tag_set], tag_name)
+			else
+				val = instance[c.to_sym]
+			end
+
+			if fuzzy_match_value
+				instance_matches |= fuzzymatch(fuzzy_match_value, val)
+			end
+
+			if exact_match_value
+				instance_matches |= (exact_match_value == val)
+			end
+
+			if not (fuzzy_match_value || exact_match_value)
+				instance_matches = true
+			end
+
+			instance_columns << val
 		end
 
-		if fuzzy_match_value
-			instance_matches |= fuzzymatch(fuzzy_match_value, val)
-		end
+		next unless instance_matches
 
-		if exact_match_value
-			instance_matches |= (exact_match_value == val)
-		end
+		instance_map[instance_i] = {
+			:id => instance[:instance_id],
+			:ip => instance[:ip_address],
+			:key => instance[:key_name],
+		}
 
-		if not (fuzzy_match_value || exact_match_value)
-			instance_matches = true
-		end
+		instance_table << instance_columns
 
-		instance_columns << val
-	end
-
-	next unless instance_matches
-
-	instance_map[instance_i] = {
-		:id => instance[:instance_id],
-		:ip => instance[:ip_address],
-		:key => instance[:key_name],
-	}
-
-	instance_table << instance_columns
-
-	instance_i += 1
+		instance_i += 1
+    end
 end
 
 instance = nil
