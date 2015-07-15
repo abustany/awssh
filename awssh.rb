@@ -232,6 +232,7 @@ ec2.client.describe_instances().data()[:reservation_set].each do |res|
 		instance_map[instance_i] = {
 			:id => instance[:instance_id],
 			:ip => instance[:ip_address],
+			:private_ip => instance[:private_ip_address],
 			:key => instance[:key_name],
 		}
 
@@ -281,10 +282,12 @@ if @config['disable-host-key-check'] == true
 	ssh_params += " -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null'"
 end
 
+ssh_ip = instance[:ip].nil? ? instance[:private_ip] : instance[:ip]
+
 if cmd.size() > 0
-	puts "Running command on #{instance[:id]} (#{instance[:ip]}): #{cmd}"
+	puts "Running command on #{instance[:id]} (#{ssh_ip}): #{cmd}"
 else
-	puts "Connecting to #{instance[:id]} (#{instance[:ip]})"
+	puts "Connecting to #{instance[:id]} (#{ssh_ip})"
 end
 
 # -i to point at the right SSH key
@@ -292,4 +295,4 @@ end
 # PAM settings)
 # StrictHostKeyChecking and UserKnownHostsFile disabled so that we don't need to
 # confirm connection to new instances
-exec "ssh #{ssh_params} #{instance_key[:user]}@#{instance[:ip]} #{ARGV.join(' ')}"
+exec "ssh #{ssh_params} #{instance_key[:user]}@#{ssh_ip} #{ARGV.join(' ')}"
