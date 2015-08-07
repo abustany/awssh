@@ -19,18 +19,14 @@ you'd name the file ec2-user@my_key.pem.
 Use
 ===
 
-Just put the script somewhere in your path and run it, optionally passing the
+Just put the binary somewhere in your path and run it, optionally passing the
 AWS region to use as a parameter. You can also pass a command to run on the
 instance after all the options, like this:
 
-```awssh --region eu-west-1 -- tail -f /var/log/messages```
+```awssh -r eu-west-1 -- tail -f /var/log/messages```
 
 Passing -- is mandatory, as it'll tell awssh to stop parsing options at this
 point of the command line.
-
-TODO
-====
-- Automatically download and setup private keys from AWS when possible.
 
 ---
 [1] http://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_instances-instance_method
