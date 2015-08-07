@@ -3,3 +3,8 @@ sudo: false
 
 go:
     - 1.4
+
+notifications:
+    email:
+        on_success: change
+        on_failure: always
