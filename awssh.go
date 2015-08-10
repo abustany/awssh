@@ -358,25 +358,34 @@ func collectInstanceData(instance *ec2.Instance) map[string]string {
 
 func getInstances(region string) ([]map[string]string, error) {
 	awsec2 := ec2.New(&aws.Config{Region: aws.String(region)})
-
-	res, err := awsec2.DescribeInstances(&ec2.DescribeInstancesInput{
-		Filters: []*ec2.Filter{
-			{
-				Name:   aws.String("instance-state-name"),
-				Values: []*string{aws.String(ec2.InstanceStateNameRunning)},
-			},
-		},
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
 	instances := []map[string]string{}
+	var nextToken *string
 
-	for _, reservation := range res.Reservations {
-		for _, instance := range reservation.Instances {
-			instances = append(instances, collectInstanceData(instance))
+	for {
+		res, err := awsec2.DescribeInstances(&ec2.DescribeInstancesInput{
+			Filters: []*ec2.Filter{
+				{
+					Name:   aws.String("instance-state-name"),
+					Values: []*string{aws.String(ec2.InstanceStateNameRunning)},
+				},
+			},
+			NextToken: nextToken,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, reservation := range res.Reservations {
+			for _, instance := range reservation.Instances {
+				instances = append(instances, collectInstanceData(instance))
+			}
+		}
+
+		nextToken = res.NextToken
+
+		if res.NextToken == nil {
+			break
 		}
 	}
 
