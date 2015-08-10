@@ -1,5 +1,7 @@
 Makes SSHing to AWS instances less painful
 
+[![Build Status](https://travis-ci.org/abustany/awssh.svg?branch=master)](https://travis-ci.org/abustany/awssh)
+
 Setup
 =====
 
