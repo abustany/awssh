@@ -2,6 +2,17 @@ Makes SSHing to AWS instances less painful
 
 [![Build Status](https://travis-ci.org/abustany/awssh.svg?branch=master)](https://travis-ci.org/abustany/awssh)
 
+Get it
+======
+
+Until I host binary releases somewhere, you can get this tool from source with
+
+```
+go get github.com/abustany/awssh
+```
+
+This will require a working [Go](https://www.golang.org/) environment.
+
 Setup
 =====
 
