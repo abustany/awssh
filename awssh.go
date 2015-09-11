@@ -596,7 +596,13 @@ key needed to connect to that instance.
 		log.Fatal("Could not find ssh in PATH")
 	}
 
-	if err := syscall.Exec(sshBin, sshArgs, nil); err != nil {
+	sshEnv := []string{}
+
+	if term := os.Getenv("TERM"); term != "" {
+		sshEnv = append(sshEnv, "TERM="+term)
+	}
+
+	if err := syscall.Exec(sshBin, sshArgs, sshEnv); err != nil {
 		log.Fatalf("Cannot spawn ssh: %s", err)
 	}
 }
