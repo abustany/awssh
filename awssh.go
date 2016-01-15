@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"log"
 	"os"
@@ -357,7 +358,7 @@ func collectInstanceData(instance *ec2.Instance) map[string]string {
 }
 
 func getInstances(region string) ([]map[string]string, error) {
-	awsec2 := ec2.New(&aws.Config{Region: aws.String(region)})
+	awsec2 := ec2.New(session.New(), &aws.Config{Region: aws.String(region)})
 	instances := []map[string]string{}
 	var nextToken *string
 
